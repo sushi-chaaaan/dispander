@@ -79,8 +79,8 @@ async def _delete_dispand(bot: discord.Client, message: discord.Message, operato
             await extra_message.delete()
 
 
-async def dispand(message):
-    messages = await extract_message(message)
+async def dispand(bot, message):
+    messages = await extract_message(bot, message)
     embeds = []
     for m in messages:
         sent_messages = []
@@ -121,12 +121,13 @@ async def dispand(message):
     return embeds[:10]
 
 
-async def extract_message(message):
+async def extract_message(bot, message):
     messages = []
     for ids in re.finditer(regex_discord_message_url, message.content):
         if message.guild.id != int(ids['guild']):
             continue
         fetched_message = await fetch_message_from_id(
+            bot=bot,
             guild=message.guild,
             channel_id=int(ids['channel']),
             message_id=int(ids['message']),
@@ -135,7 +136,7 @@ async def extract_message(message):
     return messages
 
 
-async def fetch_message_from_id(guild, channel_id, message_id):
+async def fetch_message_from_id(bot, guild, channel_id, message_id):
     channel = guild.get_channel_or_thread(channel_id)
     if channel is None:
         channel = await bot.fetch_channel(channel_id)
