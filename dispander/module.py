@@ -185,11 +185,22 @@ def compose_embed(message):
     embed.set_author(
         name=message.author.display_name,
         icon_url=message.author.avatar.url,
-        url=message.jump_url
     )
     embed.set_footer(
         text=message.channel.name,
         icon_url=message.guild.icon.url,
+    )
+    embed.add_field(
+        name="チャンネル",
+        value=message.channel.mention,
+    )
+    embed.add_field(
+        name="送信した人",
+        value=message.author.mention,
+    )
+    embed.add_field(
+        name="元のメッセージ",
+        value=message.jump_url,
     )
     if message.attachments and message.attachments[0].proxy_url:
         embed.set_image(
