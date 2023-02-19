@@ -2,7 +2,7 @@ from typing import Optional
 import os
 
 import discord
-from discord import Embed
+from discord import Colour, Embed
 from discord.ext import commands
 import re
 
@@ -26,7 +26,7 @@ class ExpandDiscordMessageUrl(commands.Cog):
     async def on_message(self, message):
         if message.author.bot:
             return
-        await dispand(message)
+        await dispand(self.bot, message)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
@@ -82,12 +82,8 @@ async def dispand(bot, message):
     messages = await extract_message(bot, message)
     embeds = []
     for m in messages:
-        sent_messages = []
-
         if m.content or m.attachments:
             embeds.append(compose_embed(m))
-            # sent_message = await message.channel.send(embed=compose_embed(m))
-            # sent_messages.append(sent_message)
         # Send the second and subsequent attachments with embed (named 'embed') respectively:
         for attachment in m.attachments[1:]:
             embed = Embed()
@@ -95,13 +91,9 @@ async def dispand(bot, message):
                 url=attachment.proxy_url
             )
             embeds.append(embed)
-            # sent_attachment_message = await message.channel.send(embed=embed)
-            # sent_messages.append(sent_attachment_message)
 
         for embed in m.embeds:
             embeds.append(embed)
-            # sent_embed_message = await message.channel.send(embed=embed)
-            # sent_messages.append(sent_embed_message)
 
     return embeds[:10]
 
@@ -165,19 +157,26 @@ def from_jump_url(url):
 def compose_embed(message):
     embed = Embed(
         description=message.content,
+        color=Colour(0x3498DB),
         timestamp=message.created_at,
     )
     embed.set_author(
         name=message.author.display_name,
-        icon_url=message.author.avatar.url,
+        icon_url=message.author.display_avatar.url,
     )
+
+    if message.guild is None or message.guild.icon is None:
+        guild_icon_url = ""
+    else:
+        guild_icon_url = message.guild.icon.url
+
     embed.set_footer(
-        text=message.channel.name,
-        icon_url=message.guild.icon.url,
+        text=message.channel.name or "",
+        icon_url=guild_icon_url,
     )
     embed.add_field(
         name="チャンネル",
-        value=message.channel.mention,
+        value=message.channel.mention or "",
     )
     embed.add_field(
         name="送信した人",
