@@ -164,16 +164,6 @@ def compose_embed(message):
         name=message.author.display_name,
         icon_url=message.author.display_avatar.url,
     )
-
-    if message.guild is None or message.guild.icon is None:
-        guild_icon_url = ""
-    else:
-        guild_icon_url = message.guild.icon.url
-
-    embed.set_footer(
-        text=message.channel.name or "",
-        icon_url=guild_icon_url,
-    )
     embed.add_field(
         name="チャンネル",
         value=message.channel.mention or "",
@@ -184,7 +174,8 @@ def compose_embed(message):
     )
     embed.add_field(
         name="元のメッセージ",
-        value=message.jump_url,
+        value=f"[移動]({message.jump_url})",
+        inline=False,
     )
     if message.attachments and message.attachments[0].proxy_url:
         embed.set_image(
