@@ -186,11 +186,11 @@ def compose_embed(message):
     embed.add_field(
         name="元のメッセージ",
         value=f"[移動]({message.jump_url})",
-        inline=False,
     )
     embed.add_field(
         name="チャンネル",
         value=message.channel.mention or "",
+        inline=False,
     )
     if message.attachments and message.attachments[0].proxy_url:
         embed.set_image(
