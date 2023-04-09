@@ -78,14 +78,14 @@ async def _delete_dispand(bot: discord.Client, message: discord.Message, operato
             await extra_message.delete()
 
 
-async def dispand(message):
+async def dispand(message, with_reference=True):
     messages = await extract_message(message)
     embeds = []
     for m in messages:
         # sent_messages = []
 
         if m.content or m.attachments:
-            embeds.append(compose_embed(m))
+            embeds.append(compose_embed(m, with_reference))
             # sent_message = await message.channel.send(embed=compose_embed(m))
             # sent_messages.append(sent_message)
         # Send the second and subsequent attachments with embed (named 'embed') respectively:
@@ -171,7 +171,7 @@ def from_jump_url(url):
     }
 
 
-def compose_embed(message):
+def compose_embed(message, with_reference):
     embed = Embed(
         description=message.content,
         color=Colour(0x3498DB),
@@ -186,14 +186,15 @@ def compose_embed(message):
         value=message.author.mention,
     )
     embed.add_field(
-        name="元のメッセージ",
-        value=f"[移動]({message.jump_url})",
-    )
-    embed.add_field(
         name="チャンネル",
         value=message.channel.mention or "",
         inline=False,
     )
+    if with_reference:
+        embed.add_field(
+            name="元のメッセージ",
+            value=f"[移動]({message.jump_url})",
+        )
     if message.attachments and message.attachments[0].proxy_url:
         embed.set_image(
             url=message.attachments[0].proxy_url
