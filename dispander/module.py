@@ -199,7 +199,6 @@ def compose_embed(message, with_reference):
     embed.add_field(
         name="チャンネル",
         value=message.channel.mention or "",
-        inline=False,
     )
     if with_reference:
         embed.add_field(
