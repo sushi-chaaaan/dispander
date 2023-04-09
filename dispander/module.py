@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, TypedDict
 import os
 
 import discord
@@ -31,6 +31,12 @@ class ExpandDiscordMessageUrl(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
         await delete_dispand(self.bot, payload=payload)
+
+
+class ExtractedMessage(TypedDict):
+    id: int
+    jump_url: str
+    embeds: list[discord.Embed]
 
 
 async def delete_dispand(bot: discord.Client,
@@ -80,10 +86,10 @@ async def _delete_dispand(bot: discord.Client, message: discord.Message, operato
 
 async def dispand(message, with_reference=True):
     messages = await extract_message(message)
-    embeds = []
+    extracted: list["ExtractedMessage"] = []
     for m in messages:
         # sent_messages = []
-
+        embeds = []
         if m.content or m.attachments:
             embeds.append(compose_embed(m, with_reference))
             # sent_message = await message.channel.send(embed=compose_embed(m))
@@ -113,7 +119,12 @@ async def dispand(message, with_reference=True):
         #     url=make_jump_url(message, m, sent_messages)
         # )
         # await main_message.edit(embed=main_embed)
-    return embeds[:10]
+        extracted.append({
+            "id": m.id,
+            "jump_url": m.jump_url,
+            "embeds": embeds,
+        })
+    return extracted
 
 
 async def extract_message(message):
